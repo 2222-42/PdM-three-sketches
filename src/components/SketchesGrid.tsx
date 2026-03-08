@@ -1,3 +1,26 @@
+const RenderIframe = ({ code, title, type }: { code: string; title: string; type: string }) => (
+    <div className="flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-[600px]">
+        <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                    Option {type}
+                </span>
+                <span className="font-medium text-gray-700 text-sm">{title}</span>
+            </div>
+            <div className="text-xs text-gray-400">React + Tailwind</div>
+        </div>
+        <div className="flex-1 overflow-hidden bg-white">
+            {/* Using srcdoc for safe execution of AI generated code */}
+            <iframe
+                srcDoc={code}
+                className="w-full h-full border-none"
+                sandbox="allow-scripts"
+                title={`Sketch ${type}`}
+            />
+        </div>
+    </div>
+);
+
 export default function SketchesGrid({
     sketches,
     isGenerating,
@@ -30,29 +53,6 @@ export default function SketchesGrid({
             </div>
         );
     }
-
-    const RenderIframe = ({ code, title, type }: { code: string; title: string; type: string }) => (
-        <div className="flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-[600px]">
-            <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
-                        Option {type}
-                    </span>
-                    <span className="font-medium text-gray-700 text-sm">{title}</span>
-                </div>
-                <div className="text-xs text-gray-400">React + Tailwind</div>
-            </div>
-            <div className="flex-1 overflow-hidden bg-white">
-                {/* Using srcdoc for safe execution of AI generated code */}
-                <iframe
-                    srcDoc={code}
-                    className="w-full h-full border-none"
-                    sandbox="allow-scripts"
-                    title={`Sketch ${type}`}
-                />
-            </div>
-        </div>
-    );
 
     return (
         <div className="flex-1 grid grid-cols-1 xl:grid-cols-3 gap-6">

@@ -172,25 +172,25 @@ const MOCK_C = `<!DOCTYPE html>
 </html>`;
 
 export async function POST(request: Request) {
-    try {
-        const { goal, structuredData } = await request.json();
+  try {
+    const { structuredData } = await request.json();
 
-        if (!goal || !structuredData) {
-            return NextResponse.json({ error: 'Goal and structured data are required' }, { status: 400 });
-        }
-
-        // Simulate longer network delay for sketch generation
-        await new Promise(resolve => setTimeout(resolve, 3000));
-
-        // Array of mock sketches
-        return NextResponse.json({
-            sketchA: MOCK_A,
-            sketchB: MOCK_B,
-            sketchC: MOCK_C
-        });
-
-    } catch (error) {
-        console.error("Error generating sketches:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    if (!structuredData) {
+      return NextResponse.json({ error: 'Structured data is required' }, { status: 400 });
     }
+
+    // Simulate longer network delay for sketch generation
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    // Array of mock sketches
+    return NextResponse.json({
+      sketchA: MOCK_A,
+      sketchB: MOCK_B,
+      sketchC: MOCK_C
+    });
+
+  } catch (error) {
+    console.error("Error generating sketches:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }

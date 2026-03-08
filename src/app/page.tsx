@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import GoalInput from '@/components/GoalInput';
+import TranscriptArea from '@/components/TranscriptArea';
 import SketchesGrid from '@/components/SketchesGrid';
 
 interface StructuredData {
@@ -19,7 +19,6 @@ interface Sketches {
 }
 
 export default function Home() {
-  const [goal, setGoal] = useState('');
   const [transcript, setTranscript] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [structuredData, setStructuredData] = useState<StructuredData | null>(null);
@@ -27,7 +26,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
-    if (!goal.trim()) return;
+    if (!transcript.trim()) return;
 
     setIsGenerating(true);
     setError(null);
@@ -39,7 +38,7 @@ export default function Home() {
       const structureRes = await fetch('/api/generate-structure', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ goal, transcript }),
+        body: JSON.stringify({ transcript }),
       });
 
       if (!structureRes.ok) throw new Error('Failed to generate structure');
@@ -50,7 +49,7 @@ export default function Home() {
       const sketchesRes = await fetch('/api/generate-sketches', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ goal, structuredData: generatedStructure }),
+        body: JSON.stringify({ structuredData: generatedStructure }),
       });
 
       if (!sketchesRes.ok) throw new Error('Failed to generate sketches');
@@ -103,9 +102,7 @@ export default function Home() {
 
           {/* Left Column (Input & Context) */}
           <div className="w-full lg:w-[400px] flex flex-col gap-6 shrink-0">
-            <GoalInput
-              goal={goal}
-              setGoal={setGoal}
+            <TranscriptArea
               transcript={transcript}
               setTranscript={setTranscript}
               onGenerate={handleGenerate}

@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     try {
-        const { goal, transcript } = await request.json();
+        const { transcript } = await request.json();
 
-        if (!goal) {
-            return NextResponse.json({ error: 'Goal is required' }, { status: 400 });
+        if (!transcript) {
+            return NextResponse.json({ error: 'Transcript is required' }, { status: 400 });
         }
 
         // Simulate network delay
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
                 "Data is refreshed every 15 minutes",
             ],
             workflow: "1. Open app -> 2. See high-level summary cards -> 3. View list of low-stock items -> 4. Tap item for details/reorder",
-            progress: "Initial mock generation based on Goal input"
+            progress: "Initial mock generation based on Transcript input"
         });
 
     } catch (error) {
