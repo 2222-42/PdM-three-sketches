@@ -10,18 +10,13 @@
 - Hackathon制約：3時間以内にMVP完成・Vercelデプロイ可能。提供ツールフル活用。
 
 ## 2. コア機能要件（MVP必須）
-### 2.1 Goal入力
-- テキストエリアでPdMがプロダクトGoalを入力（例: "在庫管理アプリのモバイルダッシュボード"）
-- 必須：入力必須、200文字以内推奨
-
-### 2.2 Transcript Import
-- 方法A（優先）：テキストエリアにミーティングtranscriptを貼り付け（Hackathonデモ用最小実装）
-- 方法B（差別化）：VoiceOSまたはCactus ComputeでリアルタイムSTT（ブラウザマイクから日本語文字起こし）
-- 会話履歴保持：直近30-60秒分 or 全Import分を保持
+### 2.1 音声入力からの文字起こし (AI/API Transcription)
+- テキスト手動入力ではなく、AIやAPI（VoiceOSまたはCactus Computeなど）を用いた音声からの自動文字起こしを主とする。
+- 会話履歴保持：直近の音声からリアルタイムあるいは一定間隔でテキスト化し保持する。
 
 ### 2.3 Structure生成（JSON化）
 - ボタン押下でLLMコール
-- 入力：Goal + Transcript
+- 入力：Transcript（自動文字起こしテキスト）
 - 出力：厳格なJSON形式（以下スキーマ厳守）
   ```json
   {
@@ -37,7 +32,7 @@
 ### 2.4 3 Sketches生成
 
 - ボタン押下でLLMコール（並列推奨：Blaxel活用）
-- 入力：上記structured JSON + Goal
+- 入力：上記structured JSON
 - 出力：3つの独立したReact + Tailwindコードスニペット（文字列）
   - Sketch A: Simplest solution（最小機能、クリーンUI）
   - Sketch B: Data-visualization focused（グラフ/テーブル重視）
@@ -71,12 +66,12 @@
 - LLM: Groq (Llama 3.1 70B) / Gemini 1.5 Flash / Shisa AI（Claude代替）
 - LLM実行: Blaxel sandbox + Morph/Superset並列コーディング
 - STT/声操作: VoiceOS or Cactus Compute
-- データ強化（オプション）: CrustData（Goalに会社名入れると文脈追加）
+- データ強化（オプション）: CrustData（書き起こし内に会社名等があれば文脈追加）
 - レンダリング: iframe + srcdoc + Tailwind CDN
 
 ### 5. 成功基準（MVPデモで満たすもの）
 
-- Goal入力 → Transcript貼り付け → Structure JSON表示
+- 音声入力（自動文字起こし）によるTranscript取得 → Structure JSON表示
 - Generate 3 Sketches押下 → 3つのUIが即プレビュー表示
 - デモ動画1.5分：実際のPdM会話例（在庫管理アプリ）で3つの異なるUIが出てくる様子
 - ツールアピール：VoiceOSで声コマンド、Blaxelで安全生成、Morphで爆速開発など

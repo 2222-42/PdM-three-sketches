@@ -4,24 +4,19 @@
 PdM 3 Sketches / Meeting to Prototypesは、オンラインミーティングでの抽象的な議論やゴールから、具体的な3パターンのUIスケッチ（Reactコンポーネント）をAIで即座に生成しプレビューするツールです。PdMの「要求定義から具体的なUIまでのギャップ」を埋めます。
 
 ## 2. ユーザーフロー (User Flow)
-1. **ゴール入力**: PdMが現在検討中のプロダクト要件・Goalをテキストエリアに入力します。
-2. **Transcriptインポート**: ミーティングの会話内容テキストを入力（または音声入力・文字起こしで取得）します。
-3. **要件構造化**: [Generate Structure]ボタン押下で、LLMが入力情報を解析し、JSON形式で課題・要件・制約・ワークフローを進捗に整理します。
-4. **UIスケッチ生成**: [Generate Sketches]ボタン押下で、構造化されたJSONとGoalをもとに、アプローチの異なる3つの独立したReactコンポーネントコード（Tailwind付き）を生成します。
-5. **プレビューと確認**: 右側のパネルに3パターンのプレビュー（Simple / Data-heavy / Mobile）が即座に表示され、PdMが視覚的にUIの方向性を確認できます。
+1. **音声からの自動文字起こし**: ミーティングの会話内容をAIや外部APIを用いてリアルタイム（またはバッチ）で自動的に文字起こし（Transcript）して取得します。人間による手動テキスト入力は行いません。
+2. **要件構造化**: [Generate Structure]ボタン押下で、LLMが文字起こしされたTranscriptを解析し、JSON形式で課題・要件・制約・ワークフローを進捗に整理します。
+3. **UIスケッチ生成**: [Generate Sketches]ボタン押下で、構造化された要件JSONをもとに、アプローチの異なる3つの独立したReactコンポーネントコード（Tailwind付き）を生成します。
+4. **プレビューと確認**: 右側のパネルに3パターンのプレビュー（Simple / Data-heavy / Mobile）が即座に表示され、PdMが視覚的にUIの方向性を確認できます。
 
 ## 3. 機能仕様詳細 (Functional Specs)
 ### 3.1 入力セクション (Input Area)
-- **Goal TextInput**:
-  - 最大文字数: 200文字（推奨）
-  - バリデーション: 空白での送信不可
-- **Transcript Input**:
-  - 形式: プレーンテキスト（手動貼り付け）
-  - 発展機能: Voice API連携でのリアルタイム入力
+- **Transcript Input (Auto)**:
+  - 手動貼り付けではなく、AIやAPI連携（VoiceOS等）による音声からのリアルタイム自動文字起こしテキストを表示・保持するエリア。
 
 ### 3.2 構造化モジュール (JSON Generator)
 - **トリガー**: ボタンプッシュ
-- **処理**: Goal + TranscriptをLLM (Groq Llama 3.1 70B等)に入力。
+- **処理**: 音声から生成されたTranscriptテキストをLLM (Groq Llama 3.1 70B等)に入力。
 - **出力形式**:
   ```json
   {
@@ -36,7 +31,7 @@ PdM 3 Sketches / Meeting to Prototypesは、オンラインミーティングで
   - JSONパース失敗時、リトライまたは正規表現でのフォールバック抽出処理を行う。（NEEDS CLARIFICATIONの定義に基づく）
 
 ### 3.3 UI生成モジュール (Sketches Generator)
-- **入力**: 構造化された要件JSON + ユーザーGoal
+- **入力**: 構造化された要件JSON
 - **生成バリエーション**:
   1. Sketch A (Simplest): 最低限の機能に絞ったクリーンなUI
   2. Sketch B (Data-heavy): グラフやテーブルを多用したデータ可視化特化UI
@@ -59,8 +54,7 @@ PdM 3 Sketches / Meeting to Prototypesは、オンラインミーティングで
 
 ## 5. ACCEPTANCE_CRITERIA (受入基準)
 *本セクションはRule `spec-first-enforcement`に基づく*
-- [ ] ユーザーは200文字以内でGoalを入力でき、入力必須エラーを適切に受け取れること。
-- [ ] Transcriptが空で構造化ボタンを押した場合、エラーまたは警告が表示されること。
+- [ ] AI/API経由で取得したTranscriptが空録音や無音などで取得できず、空のまま構造化ボタンを押した場合、エラーまたは警告が表示されること。
 - [ ] LLMの応答が不正なJSONだった場合でも、画面クラッシュせずエラー表示・ハンドリングができること。
 - [ ] 結果として3つのiframeにそれぞれのSketchA, B, Cが正しくレンダリングされること（各々にTailwindが適用されていること）。
 - [ ] iframe内で発生したJavaScriptエラーが、親要素のクラッシュを引き起こさずコンソール/UI上で捉えられること。

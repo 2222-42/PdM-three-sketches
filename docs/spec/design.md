@@ -9,20 +9,19 @@
 - **UIフレームワーク**: React 18 / Next.js 14+ (App Router)
 - **スタイリング**: TailwindCSS
 - **主要なコンポーネント**:
-  - `GoalInput`: GoalやTranscriptを受け取るフォーム群。
+  - `TranscriptionArea`: AI/API経由で取得した音声文字起こし結果（Transcript）を表示するコンポーネント。
   - `JSONPreview`: 生成された構造化済要件（JSON）を視覚的に表示・確認するエリア。
   - `SketchesGrid`: 3つのプレビューを展開するレイアウトコンポーネント。
   - `SandboxedIframe`: Sketchコードを安全にマウントしてレンダリングするコンポーネント(`srcdoc`利用)。
 
 ### 2.2 バックエンド・外部API (Backend & Ext-API)
-- **Next.js API Routes / Server Actions**: クライアントからのリクエスト（Goal+Transcript）を受け取り、LLMにプロンプトを構築して投げる。
+- **Next.js API Routes / Server Actions**: クライアントからのリクエスト（Transcript）を受け取り、LLMにプロンプトを構築して投げる。
 - **LLMプロバイダ**: Groq (Llama 3) / Gemini (Flash) / Shisa AI 等
 - **主要エンドポイント**: `app/api/generate-structure`, `app/api/generate-sketches`
 
 ## 3. データフローとステート管理 (Data Flow & State)
 - **状態管理**: 基本はReact標準の `useState` と `useTransition` / `useAsync`（React Query等も検討可、ただしMVPはシンプルに）。
 - **Global / Page State**: 
-  - `goal` (string)
   - `transcript` (string)
   - `structuredData` (JSON Object)
   - `sketches` ({ A: string, B: string, C: string })
@@ -35,7 +34,6 @@
 - **Request**:
   ```json
   {
-    "goal": "在庫管理アプリのダッシュボード",
     "transcript": "先日のMTGの話ですが..."
   }
   ```
@@ -54,7 +52,6 @@
 - **Request**:
   ```json
   {
-    "goal": "...",
     "structuredData": { ... }
   }
   ```
