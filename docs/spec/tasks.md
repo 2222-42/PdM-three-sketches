@@ -40,6 +40,12 @@
 ## Phase 3: 最終ステップ (Final Step - Polish & Extras)
 **目標**: ハッカソンの完成度を高めるためのUX向上機能や、差別化となる＋αの機能を実装する。
 
+- [x] **Issue #1 - Frontの調整**
+  - [x] タイトルを「Meeting to Prototypes」から「3 Sketches」へ変更
+  - [x] APIのJSONレスポンスに動的な3つのUI `ideas` の抽出処理を追加
+  - [x] UIスケッチ生成時、ハードコードされた3系統（Simple/Data-heavy/Mobile）ではなく、`ideas` を用いた動的プロンプティングへ変更
+  - [x] 3つのスケッチ表示時、上部にそれぞれのアプローチを表すタイトルと説明書きを追加
+  - [x] スケッチ生成完了後、左側の Transcript/AI Understanding パネルを自動で隠す（"Peek Component" 化）
 - [ ] **リファクタリング・エラー処理の強化**
   - [ ] 生成失敗時のUIフィードバック改善（トースト通知やスケッチ個別再生成など）
   - [ ] プレビューでのJavaScriptエラー検知と親画面へのフィードバック

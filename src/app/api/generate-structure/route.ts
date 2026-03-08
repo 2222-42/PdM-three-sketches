@@ -26,11 +26,16 @@ export async function POST(request: Request) {
                 requirements: z.array(z.string()).describe("List of functional and non-functional requirements based on EARS syntax where possible."),
                 constraints: z.array(z.string()).describe("List of technical, business, or design constraints."),
                 workflow: z.string().describe("A step-by-step description of the user workflow."),
-                progress: z.string().describe("A short summary of the current progress or state of discussion.")
+                progress: z.string().describe("A short summary of the current progress or state of discussion."),
+                ideas: z.array(z.object({
+                    title: z.string().describe("Short 2-3 words title summarizing the approach for a UI sketch."),
+                    description: z.string().describe("1 sentence describing the perspective and approach of this UI idea based on the conversation.")
+                })).length(3).describe("3 distinct perspectives/approaches for UI design based on the conversation.")
             }),
             prompt: `
             Analyze the following meeting transcript.
             Extract and structure the information into specific categories: problems, requirements, constraints, user workflow, and overall progress.
+            Crucially, also provide 3 distinct UI design approaches ("ideas") based on the discussion, each with a brief 2-3 word title and a 1-sentence description.
             Use Japanese for the output unless the context specifically requires English.
             
             Meeting Transcript:
