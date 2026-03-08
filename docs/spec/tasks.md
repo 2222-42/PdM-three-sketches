@@ -23,17 +23,17 @@
 ## Phase 2: 次のステップ (Next Step - AI Integration)
 **目標**: 実際のLLM（OpenRouter経由）を組み込み、入力されたテキストから動的に構造化データおよびUIコードを生成する機能を完成させる。
 
-- [ ] **OpenRouterの連携とモデル選定**
-  - [ ] 環境変数（API Key等）の設定
-  - [ ] Next.js Server Actions または API RouteでのLLMクライアント初期化
-- [ ] **`/api/generate-structure` の動的化**
-  - [ ] System Promptの構築（出力フォーマットをJSONに強制・EARS記法指示）
-  - [ ] 自動文字起こしされたTranscriptをプロンプトに組み込んでAPI呼び出し
-  - [ ] JSONパースとエラーリカバリ（正規表現フォールバック等）の実装
-- [ ] **`/api/generate-sketches` の動的化**
-  - [ ] 3つの異なるSystem Prompt（Simple, Data-heavy, Mobile）の構築
-  - [ ] 構造化JSONをもとに、3つのLLMコールを並列実行（`Promise.all`等）する実装
-  - [ ] 出力されたReact文字列のサニタイズ（余分なマークダウンの除去など）処理
+- [x] **OpenRouterの連携とモデル選定**
+  - [x] 環境変数（API Key等）の設定
+  - [x] Next.js Server Actions または API RouteでのLLMクライアント初期化
+- [x] **`/api/generate-structure` の動的化**
+  - [x] System Promptの構築（出力フォーマットをJSONに強制・EARS記法指示）
+  - [x] 自動文字起こしされたTranscriptをプロンプトに組み込んでAPI呼び出し
+  - [x] JSONパースとエラーリカバリ（正規表現フォールバック等）の実装
+- [x] **`/api/generate-sketches` の動的化**
+  - [x] 3つの異なるSystem Prompt（Simple, Data-heavy, Mobile）の構築
+  - [x] 構造化JSONをもとに、3つのLLMコールを並列実行（`Promise.all`等）する実装
+  - [x] 出力されたReact文字列のサニタイズ（余分なマークダウンの除去など）処理
 - [ ] **E2Eマニュアルテスト（AI生成の確認）**
   - [ ] 実際の入力を与え、意図した通りの多様なUIが出力されるかテストする
 
