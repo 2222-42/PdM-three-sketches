@@ -14,6 +14,22 @@
 - テキスト手動入力ではなく、ブラウザ標準のWeb Speech APIを用いた音声からの自動文字起こしを主とする。
 - 会話履歴保持：直近の音声からリアルタイムあるいは一定間隔でテキスト化し保持する。
 
+### 2.2 CrustData Enrichment（企業文脈強化）
+
+- **目的**: Transcriptに含まれる会社ドメイン（例: `retool.com`）やLinkedIn URLを自動検出し、CrustData Company Enrich APIで企業情報を取得。取得した情報をStructure生成プロンプトに注入することで、PdMツールが「誰向けの、どんな規模の会社か」を考慮した文脈依存UIスケッチを生成する。
+- **Entity抽出（正規表現ベース）**:
+  - ドメイン名パターン（例: `example.com`, `www.example.co.jp`）
+  - LinkedIn Company URL（例: `linkedin.com/company/xxx`）
+- **CrustData API呼び出し**:
+  - エンドポイント: `POST https://api.crustdata.com/dataset/company/enrich`
+  - リクエスト: `{ company_domains: [domain] }`
+  - ヘッダー: `Authorization: Bearer CRUSTDATA_API_KEY`, `x-api-version: 2025-11-01`
+  - 取得する情報: headcount, funding_stage, industry, growth_rate, company name
+- **プロンプト注入**: 取得した企業情報を `generate-structure` のLLMプロンプトに追加し、UIアイデア生成の文脈として活用する。
+  - 注入例: `Company context: headcount=150, funding=Series B, industry=SaaS, growth=high → 小規模SaaSなのでシンプルUIを優先せよ。`
+- **フォールバック**: 会社が見つからない、またはAPIキーが未設定の場合は、一般PdM視点（文脈なし）で処理を継続し、クラッシュしない。
+- **API認証キー**: 環境変数 `CRUSTDATA_API_KEY` を使用（Hackathon参加者には$2000クレジット付きキーが提供済み）。
+
 ### 2.3 Structure生成（JSON化）
 - ボタン押下でLLMコール
 - 入力：Transcript（自動文字起こしテキスト）
@@ -67,15 +83,16 @@
 - LLM: Shisa AI (Llama 3 ベースモデル等を想定)
 - LLM実行: Blaxel sandbox + Morph/Superset並列コーディング
 - STT/声操作: Web Speech API (ブラウザ標準)
-- データ強化（オプション）: CrustData（書き起こし内に会社名等があれば文脈追加）
+- **データ強化（コア）: CrustData** — TranscriptからEntity抽出 → Company Enrich API → プロンプト注入
 - レンダリング: iframe + srcdoc + Tailwind CDN
 
 ### 5. 成功基準（MVPデモで満たすもの）
 
 - 音声入力（自動文字起こし）によるTranscript取得 → Structure JSON表示
 - Generate 3 Sketches押下 → 3つのUIが即プレビュー表示
-- デモ動画1.5分：実際のPdM会話例（在庫管理アプリ）で3つの異なるUIが出てくる様子
-- ツールアピール：Web Speech APIで手軽に音声入力、Blaxelで安全生成、Morphで爆速開発など
+- **CrustData連携**: Transcriptにドメインを含めると、企業文脈がプロンプトに注入され、生成されるideas/Sketchesが変化すること
+- デモ動画1.5分：実際のPdM会話例（在庫管理アプリ or SaaS製品）で3つの異なるUIが出てくる様子
+- ツールアピール：Web Speech APIで手軽に音声入力、CrustDataでリアルB2B文脈を注入、Blaxelで安全生成など
 
 ### 6. 次に明確化が必要な点（NEEDS CLARIFICATION）
 

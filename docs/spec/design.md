@@ -17,16 +17,32 @@
 ### 2.2 バックエンド・外部API (Backend & Ext-API)
 - **Next.js API Routes / Server Actions**: クライアントからのリクエスト（Transcript）を受け取り、LLMにプロンプトを構築して投げる。
 - **LLMプロバイダ**: Shisa AI (OpenAI API互換)
-- **主要エンドポイント**: `app/api/generate-structure`, `app/api/generate-sketches`
+- **外部データAPI**: CrustData Company Enrich API (`POST https://api.crustdata.com/dataset/company/enrich`)
+- **主要エンドポイント**: `app/api/generate-structure`, `app/api/generate-sketches`, `app/api/enrich-company`
+- **ユーティリティ**: `src/lib/extractEntities.ts`（Transcriptからドメインを抽出する関数群）
 
 ## 3. データフローとステート管理 (Data Flow & State)
 - **状態管理**: 基本はReact標準の `useState` と `useTransition` / `useAsync`（React Query等も検討可、ただしMVPはシンプルに）。
 - **Global / Page State**: 
   - `transcript` (string)
+  - `enrichedCompany` (`{ enriched: boolean, name?, headcount?, funding_stage?, industry?, growth_rate? }` | null)
   - `structuredData` (JSON Object)
   - `sketches` ({ A: string, B: string, C: string })
   - `isGeneratingStructure` (boolean)
   - `isGeneratingSketches` (boolean)
+
+**拡張されたデータフロー:**
+```
+Transcript（音声入力）
+  → extractDomains()  [src/lib/extractEntities.ts]
+  → GET /api/enrich-company?domain=xxx  [CrustData API呼び出し]
+  → companyContext文字列生成 (or フォールバック)
+  → POST /api/generate-structure (transcript + companyContext)
+  → structuredData (JSON: problems/requirements/constraints/workflow/ideas)
+  → POST /api/generate-sketches (structuredData)
+  → sketchA / sketchB / sketchC (HTML文字列)
+  → iframe srcdocでレンダリング
+```
 
 ## 4. API定義 (API Specs)
 
@@ -65,6 +81,32 @@
   ```
 - **並列処理**:
   生成速度要件（10秒以内）を満たすため、サーバサイドまたはクライアントからの呼び出し時に、A/B/C 3パターンの生成プロンプトを別々に構築し、`Promise.all`等を用いて完全並列でリクエスト・解決する。
+
+### 4.3 `GET /api/enrich-company?domain=<domain>`
+- **Request**: クエリパラメータ `domain` (例: `retool.com`)
+- **Response** (Success - 見つかった場合):
+  ```json
+  {
+    "enriched": true,
+    "name": "Retool",
+    "headcount": 500,
+    "funding_stage": "Series C",
+    "industry": "Software",
+    "growth_rate": "high"
+  }
+  ```
+- **Response** (Fallback - 見つからない/エラー時):
+  ```json
+  { "enriched": false }
+  ```
+- **認証**: `Authorization: Bearer ${CRUSTDATA_API_KEY}`, `x-api-version: 2025-11-01`
+
+### 4.4 環境変数
+| 変数名 | 用途 |
+|--------|------|
+| `SHISA_API_KEY` | Shisa AI LLM呼び出し |
+| `SHISA_MODEL` | Shisa AIモデル名（省略時デフォルト使用） |
+| `CRUSTDATA_API_KEY` | CrustData Company Enrich API認証 |
 
 ## 5. エラーリカバリ設計 (Error Recovery Strategy)
 - **JSON Parse Error**: LLMがJSONプレーンテキストではなくMarkdown(コードブロック)を含めて回答した場合、それをサーバサイドの正規表現等で `\{.*\}` 部分だけ抽出し、フォールバックとして `JSON.parse` する。破綻した場合はエラーを返す。
