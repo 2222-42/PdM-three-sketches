@@ -64,7 +64,7 @@
 ### 4. 技術スタック（Hackathon提供ツール優先）
 
 - Frontend: Next.js (App Router)
-- LLM: OpenRouter (Llama 3 等を想定)
+- LLM: Shisa AI (Llama 3 ベースモデル等を想定)
 - LLM実行: Blaxel sandbox + Morph/Superset並列コーディング
 - STT/声操作: Web Speech API (ブラウザ標準)
 - データ強化（オプション）: CrustData（書き起こし内に会社名等があれば文脈追加）
