@@ -1,14 +1,14 @@
 const RenderIframe = ({ code, title, description, type }: { code: string; title: string; description?: string; type: string }) => (
     <div className="flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-[600px]">
         <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex flex-col justify-center gap-1 min-h-[70px]">
-            <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded shrink-0">
+            <div className="flex gap-2 items-start">
+                <span className="font-mono text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded shrink-0 mt-0.5">
                     Option {type}
                 </span>
-                <span className="font-medium text-gray-800 text-sm truncate" title={title}>{title}</span>
+                <span className="font-medium text-gray-800 text-sm break-words line-clamp-2" title={title}>{title}</span>
             </div>
             {description && (
-                <div className="text-xs text-gray-500 truncate" title={description}>
+                <div className="text-xs text-gray-500 break-words line-clamp-2 mt-1" title={description}>
                     {description}
                 </div>
             )}
