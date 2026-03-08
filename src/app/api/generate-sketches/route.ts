@@ -22,11 +22,13 @@ CRITICAL DESIGN REQUIREMENTS (Premium/Modern App-like UI):
 
 OUTPUT CONSTRAINTS:
 - Output ONLY valid HTML/React code.
+- **DO NOT OUTPUT JSON. DO NOT OUTPUT FUNCTION CALLS.**
 - Provide a full HTML structure with Tailwind CDN script (\`<script src="https://cdn.tailwindcss.com"></script>\`) in the <head>.
 - Do NOT output any markdown blocks (like \`\`\`html or \`\`\`tsx). Just pure parsable HTML text.
 - Use hardcoded mock data that looks realistic and rich.
 - Do NOT import any external React hooks or components; if interactivity is needed, use plain inline HTML/JS like \`onclick="alert('...')"\`.
 - Keep the component fully contained in one file.
+- **ABSOLUTELY NO JSON WRAPPERS. Return the raw HTML string directly.**
 `;
 
 export async function POST(request: Request) {
