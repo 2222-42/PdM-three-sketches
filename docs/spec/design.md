@@ -1,7 +1,7 @@
 # Technical Design (design.md)
 
 ## 1. アーキテクチャ概要 (Architecture Overview)
-本システムはNext.js (App Router)上に構築されるクライアント・サーバーアーキテクチャのWebアプリケーションです。LLM呼び出しなどはバックエンド/サーバーアクションを通じて外部API（OpenRouter等）にリクエストをプロキシして解決します。
+本システムはNext.js (App Router)上に構築されるクライアント・サーバーアーキテクチャのWebアプリケーションです。LLM呼び出しなどはバックエンド/サーバーアクションを通じて外部API（Shisa AI等）にリクエストをプロキシして解決します。
 
 ## 2. システム構成要素 (System Components)
 
@@ -16,7 +16,7 @@
 
 ### 2.2 バックエンド・外部API (Backend & Ext-API)
 - **Next.js API Routes / Server Actions**: クライアントからのリクエスト（Transcript）を受け取り、LLMにプロンプトを構築して投げる。
-- **LLMプロバイダ**: OpenRouter
+- **LLMプロバイダ**: Shisa AI (OpenAI API互換)
 - **主要エンドポイント**: `app/api/generate-structure`, `app/api/generate-sketches`
 
 ## 3. データフローとステート管理 (Data Flow & State)

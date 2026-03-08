@@ -21,9 +21,9 @@
   - [x] Vercelの公開URLで正常に全フロー（モック）が動くことを確認する。
 
 ## Phase 2: 次のステップ (Next Step - AI Integration)
-**目標**: 実際のLLM（OpenRouter経由）を組み込み、入力されたテキストから動的に構造化データおよびUIコードを生成する機能を完成させる。
+**目標**: 実際のLLM（Shisa AI経由）を組み込み、入力されたテキストから動的に構造化データおよびUIコードを生成する機能を完成させる。
 
-- [x] **OpenRouterの連携とモデル選定**
+- [x] **Shisa AIの連携とモデル選定**
   - [x] 環境変数（API Key等）の設定
   - [x] Next.js Server Actions または API RouteでのLLMクライアント初期化
 - [x] **`/api/generate-structure` の動的化**

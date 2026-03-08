@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { generateObject } from 'ai';
-import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { createOpenAI } from '@ai-sdk/openai';
 import { z } from 'zod';
 
-const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY,
+// Initialize OpenAI client with Shisa AI base URL
+const shisa = createOpenAI({
+    baseURL: 'https://api.shisa.ai/v1',
+    apiKey: process.env.SHISA_API_KEY,
 });
 
 export async function POST(request: Request) {
@@ -15,12 +17,14 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Transcript is required' }, { status: 400 });
         }
 
-        if (!process.env.OPENROUTER_API_KEY) {
-            return NextResponse.json({ error: 'OPENROUTER_API_KEY is not set' }, { status: 500 });
+        if (!process.env.SHISA_API_KEY) {
+            return NextResponse.json({ error: 'SHISA_API_KEY is not set' }, { status: 500 });
         }
 
+        const modelName = process.env.SHISA_MODEL || 'shisa-v1';
+
         const { object } = await generateObject({
-            model: openrouter('meta-llama/llama-3.1-70b-instruct'),
+            model: shisa(modelName),
             schema: z.object({
                 problems: z.array(z.string()).describe("List of problems or pain points identified in the transcript."),
                 requirements: z.array(z.string()).describe("List of functional and non-functional requirements based on EARS syntax where possible."),

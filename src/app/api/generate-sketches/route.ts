@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { generateText } from 'ai';
-import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { createOpenAI } from '@ai-sdk/openai';
 
-const openrouter = createOpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY,
+const shisa = createOpenAI({
+  baseURL: 'https://api.shisa.ai/v1',
+  apiKey: process.env.SHISA_API_KEY,
 });
 
 const SYSTEM_PROMPT_BASE = `
@@ -36,11 +37,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Structured data is required' }, { status: 400 });
     }
 
-    if (!process.env.OPENROUTER_API_KEY) {
-      return NextResponse.json({ error: 'OPENROUTER_API_KEY is not set' }, { status: 500 });
+    if (!process.env.SHISA_API_KEY) {
+      return NextResponse.json({ error: 'SHISA_API_KEY is not set' }, { status: 500 });
     }
 
-    const model = openrouter('meta-llama/llama-3.1-70b-instruct');
+    const modelName = process.env.SHISA_MODEL || 'shisa-v1';
+    const model = shisa(modelName);
 
     const contextStr = JSON.stringify(structuredData, null, 2);
 
