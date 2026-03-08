@@ -7,29 +7,34 @@ const shisa = createOpenAI({
   apiKey: process.env.SHISA_API_KEY,
 });
 
-const SYSTEM_PROMPT_BASE = `
-You are an expert Frontend Developer and UX/UI Designer.
-Your task is to generate a SINGLE React Functional Component using Tailwind CSS based on the provided requirements.
-
-CRITICAL DESIGN REQUIREMENTS (Premium/Modern App-like UI):
-- The generated UI MUST look like a high-quality, polished, modern web application (similar to Claude Artifacts).
-- Do NOT output basic, barebones HTML. You MUST use rich Tailwind features: shadows (\`shadow-sm\`, \`shadow-md\`, \`shadow-lg\`), rounded corners (\`rounded-lg\`, \`rounded-xl\`, \`rounded-2xl\`), and subtle borders (\`border\`, \`border-slate-200\`).
-- Use cohesive and modern color palettes (e.g., slate/gray for text, indigo/violet/blue for primary actions, emerald for success). Avoid plain red/green/blue unless specified.
-- Use ample whitespace: generous padding (\`p-4\`, \`p-6\`, \`p-8\`) and margins.
-- Ensure proper typography: use \`text-sm\`, \`text-lg\`, \`text-xl\`, \`font-medium\`, \`font-semibold\`, \`tracking-tight\`, \`text-slate-900\` for headings, and \`text-slate-500\` for secondary text.
-- Use inline SVGs for all icons to make the UI look realistic and functional. Do NOT use external icon libraries.
-- The layout should be structured (e.g., header, sidebar/navigation, main content area, cards for data).
-
-OUTPUT CONSTRAINTS:
-- Output ONLY valid HTML/React code.
-- **DO NOT OUTPUT JSON. DO NOT OUTPUT FUNCTION CALLS.**
-- Provide a full HTML structure with Tailwind CDN script (\`<script src="https://cdn.tailwindcss.com"></script>\`) in the <head>.
-- Do NOT output any markdown blocks (like \`\`\`html or \`\`\`tsx). Just pure parsable HTML text.
-- Use hardcoded mock data that looks realistic and rich.
-- Do NOT import any external React hooks or components; if interactivity is needed, use plain inline HTML/JS like \`onclick="alert('...')"\`.
-- Keep the component fully contained in one file.
-- **ABSOLUTELY NO JSON WRAPPERS. Return the raw HTML string directly.**
-`;
+function buildSketchPrompt(idea: { title: string; description: string }, context: string): string {
+  return [
+    'You are an expert Frontend Developer. Generate a SINGLE complete HTML page as a UI prototype.',
+    '',
+    'DESIGN REQUIREMENTS:',
+    '- Use Tailwind CSS CDN. Include <script src="https://cdn.tailwindcss.com"></script> in <head>.',
+    '- Modern, premium app-like design with cards, shadows, rounded corners, and color gradients.',
+    '- Use inline SVGs for icons. No external icon libraries.',
+    '- Include realistic, hardcoded mock data.',
+    '- Structure: header nav + main content area + cards/tables.',
+    '- Tailwind classes: shadow-md, rounded-xl, text-slate-900, indigo/violet for actions, emerald for success.',
+    '',
+    'OUTPUT FORMAT - CRITICAL:',
+    '- Your entire output MUST be a valid HTML document starting with <!DOCTYPE html> or <html>',
+    '- Do NOT output JSON.',
+    '- Do NOT call functions or tools.',
+    '- Do NOT output code blocks like ```html. Output the raw HTML directly.',
+    '- Do NOT explain or describe what you will do. Just output the HTML.',
+    '',
+    'Design Concept: ' + idea.title,
+    'Approach: ' + idea.description,
+    '',
+    'Requirements:',
+    context,
+    '',
+    'BEGIN HTML OUTPUT NOW:',
+  ].join('\n');
+}
 
 export async function POST(request: Request) {
   try {
@@ -46,53 +51,65 @@ export async function POST(request: Request) {
     const modelName = process.env.SHISA_MODEL || 'shisa-ai/shisa-v2.1-llama3.3-70b';
     const model = shisa(modelName);
 
-    const contextStr = JSON.stringify(structuredData, null, 2);
+    // Format context as bullet-point text instead of JSON to prevent hallucination
+    const problemsList = Array.isArray(structuredData.problems)
+      ? structuredData.problems.join('; ')
+      : String(structuredData.problems || '');
+    const reqsList = Array.isArray(structuredData.requirements)
+      ? structuredData.requirements.join('; ')
+      : String(structuredData.requirements || '');
+    const constraintsList = Array.isArray(structuredData.constraints)
+      ? structuredData.constraints.join('; ')
+      : String(structuredData.constraints || '');
 
-    // Extract the 3 dynamic ideas
-    const ideas = structuredData.ideas || [
-      { title: "Simplest Solution (Clean UI)", description: "Focus on extreme simplicity and a clean, premium minimalist UI." },
-      { title: "Data-heavy (Charts/Tables)", description: "Focus on showing data effectively with a very high-quality B2B SaaS look." },
-      { title: "Mobile First (Responsive)", description: "Focus on a mobile-responsive, touch-friendly, native-app-like interface." }
+    const contextText =
+      '- Problems: ' + problemsList + '\n' +
+      '- Requirements: ' + reqsList + '\n' +
+      '- Constraints: ' + constraintsList + '\n' +
+      '- Workflow: ' + String(structuredData.workflow || '') + '\n' +
+      '- Progress: ' + String(structuredData.progress || '');
+
+    const ideas: Array<{ title: string; description: string }> = structuredData.ideas || [
+      { title: 'Simplest Clean UI', description: 'Focus on extreme simplicity and a clean, premium minimalist UI.' },
+      { title: 'Data-heavy Dashboard', description: 'Show data effectively with a very high-quality B2B SaaS look.' },
+      { title: 'Mobile First', description: 'Focus on a mobile-responsive, touch-friendly, native-app-like interface.' },
     ];
 
     // Parallel execution for 3 sketches
-    const sketchesPromises = ideas.slice(0, 3).map((idea: { title: string; description: string }) => {
+    const sketchesPromises = ideas.slice(0, 3).map((idea) => {
       return generateText({
         model,
-        system: SYSTEM_PROMPT_BASE,
-        prompt: `
-        Design Concept Title: "${idea.title}"
-        Design Approach / Perspective: "${idea.description}"
-        
-        Focus on implementing this specific approach. Translate the idea into a well-designed, functional UI component.
-        
-        Requirements Context:
-        ${contextStr}
-        `,
+        prompt: buildSketchPrompt(idea, contextText),
       });
     });
 
     const [resultA, resultB, resultC] = await Promise.all(sketchesPromises);
 
-    // Robust markdown sanitizer
-    const sanitizeResult = (text: string) => {
+    // Robust sanitizer: extract HTML if wrapped in markdown or JSON
+    const sanitizeResult = (text: string): string => {
       let cleaned = text.trim();
 
-      // Try to extract content inside ```html, ```tsx, ```jsx, or generic ``` blocks
-      const codeBlockRegex = /\`\`\`(?:html|tsx|jsx)?\s*([\s\S]*?)\`\`\`/i;
-      const match = cleaned.match(codeBlockRegex);
+      // 1. If model wrapped in ```html ... ``` or just ``` ... ```
+      const codeBlockMatch = cleaned.match(/```(?:html|tsx|jsx)?\s*([\s\S]*?)```/i);
+      if (codeBlockMatch && codeBlockMatch[1]) {
+        return codeBlockMatch[1].trim();
+      }
 
-      if (match && match[1]) {
-        // If a code block is found, use its content
-        cleaned = match[1].trim();
-      } else {
-        // Fallback: If no code blocks but it starts with conversational text,
-        // we might not be able to perfectly extract, but we can try to find the start of HTML.
-        // E.g. "Here's the code: <script..." -> "<script..."
-        const htmlStartIndex = cleaned.search(/<(?:script|div|main|html|body)/i);
-        if (htmlStartIndex > 0) {
-          cleaned = cleaned.substring(htmlStartIndex);
+      // 2. If model returned JSON/function call format, extract anything inside "html" key or just return error fallback
+      if (cleaned.startsWith('{') || cleaned.startsWith('json')) {
+        // Try to find an html string embedded inside
+        const htmlInJson = cleaned.match(/"html"\s*:\s*"([\s\S]+?)"\s*}/);
+        if (htmlInJson) {
+          return htmlInJson[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
         }
+        // Could not extract, return a fallback error UI
+        return '<html><body style="font-family:sans-serif;padding:2rem;color:#e11d48;"><h2>Generation Error</h2><p>The AI returned JSON instead of HTML. Please try again.</p></body></html>';
+      }
+
+      // 3. Find the start of any HTML tag
+      const htmlStartIndex = cleaned.search(/<(?:!DOCTYPE|html|script|div|main|body)/i);
+      if (htmlStartIndex > 0) {
+        cleaned = cleaned.substring(htmlStartIndex);
       }
 
       return cleaned;
@@ -101,11 +118,11 @@ export async function POST(request: Request) {
     return NextResponse.json({
       sketchA: sanitizeResult(resultA.text),
       sketchB: sanitizeResult(resultB.text),
-      sketchC: sanitizeResult(resultC.text)
+      sketchC: sanitizeResult(resultC.text),
     });
 
   } catch (error) {
-    console.error("Error generating sketches:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error('Error generating sketches:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
