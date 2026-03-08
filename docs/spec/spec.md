@@ -12,7 +12,7 @@ PdM 3 Sketches / Meeting to Prototypesは、オンラインミーティングで
 ## 3. 機能仕様詳細 (Functional Specs)
 ### 3.1 入力セクション (Input Area)
 - **Transcript Input (Auto)**:
-  - 手動貼り付けではなく、AIやAPI連携（VoiceOS等）による音声からのリアルタイム自動文字起こしテキストを表示・保持するエリア。
+  - 手動貼り付けではなく、ブラウザ標準のWeb Speech APIによる音声からのリアルタイム自動文字起こしテキストを表示・保持するエリア。
 
 ### 3.2 構造化モジュール (JSON Generator)
 - **トリガー**: ボタンプッシュ

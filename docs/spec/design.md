@@ -9,7 +9,7 @@
 - **UIフレームワーク**: React 18 / Next.js 14+ (App Router)
 - **スタイリング**: TailwindCSS
 - **主要なコンポーネント**:
-  - `TranscriptionArea`: AI/API経由で取得した音声文字起こし結果（Transcript）を表示するコンポーネント。
+  - `TranscriptionArea`: Web Speech API経由で取得した音声文字起こし結果（Transcript）を表示するコンポーネント。
   - `JSONPreview`: 生成された構造化済要件（JSON）を視覚的に表示・確認するエリア。
   - `SketchesGrid`: 3つのプレビューを展開するレイアウトコンポーネント。
   - `SandboxedIframe`: Sketchコードを安全にマウントしてレンダリングするコンポーネント(`srcdoc`利用)。

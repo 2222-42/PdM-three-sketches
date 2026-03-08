@@ -11,7 +11,7 @@
 
 ## 2. コア機能要件（MVP必須）
 ### 2.1 音声入力からの文字起こし (AI/API Transcription)
-- テキスト手動入力ではなく、AIやAPI（VoiceOSまたはCactus Computeなど）を用いた音声からの自動文字起こしを主とする。
+- テキスト手動入力ではなく、ブラウザ標準のWeb Speech APIを用いた音声からの自動文字起こしを主とする。
 - 会話履歴保持：直近の音声からリアルタイムあるいは一定間隔でテキスト化し保持する。
 
 ### 2.3 Structure生成（JSON化）
@@ -65,7 +65,7 @@
 - Frontend: Next.js (App Router)
 - LLM: Groq (Llama 3.1 70B) / Gemini 1.5 Flash / Shisa AI（Claude代替）
 - LLM実行: Blaxel sandbox + Morph/Superset並列コーディング
-- STT/声操作: VoiceOS or Cactus Compute
+- STT/声操作: Web Speech API (ブラウザ標準)
 - データ強化（オプション）: CrustData（書き起こし内に会社名等があれば文脈追加）
 - レンダリング: iframe + srcdoc + Tailwind CDN
 
@@ -74,7 +74,7 @@
 - 音声入力（自動文字起こし）によるTranscript取得 → Structure JSON表示
 - Generate 3 Sketches押下 → 3つのUIが即プレビュー表示
 - デモ動画1.5分：実際のPdM会話例（在庫管理アプリ）で3つの異なるUIが出てくる様子
-- ツールアピール：VoiceOSで声コマンド、Blaxelで安全生成、Morphで爆速開発など
+- ツールアピール：Web Speech APIで手軽に音声入力、Blaxelで安全生成、Morphで爆速開発など
 
 ### 6. 次に明確化が必要な点（NEEDS CLARIFICATION）
 
