@@ -43,7 +43,8 @@
 - 単一のFunctional Component（export default function SketchA() { ... }）
 - ダミーデータ使用（ハードコードOK）
 - インタラクティブ最小限（ボタンクリックでalertなど可）
-- コードは完全自立（外部importなし）
+- コードは完全自立（外部importなし。アイコンが必要な場合はインラインSVGを使用すること）
+- **UIデザイン品質**: 影（shadow）、角丸（rounded）、モダンで調和のとれた配色（Indigo/Violet/Slateなど）、十分な余白（padding/margin）、適切なタイポグラフィ構造を活用し、Claude Artifactsで生成されるような**高度にリッチでアプリライクな見た目（Premium/Modern App-like UI）**にすること。
 
 ### 2.5 プレビュー表示
 

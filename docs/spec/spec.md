@@ -58,3 +58,4 @@ PdM 3 Sketches / Meeting to Prototypesは、オンラインミーティングで
 - [ ] LLMの応答が不正なJSONだった場合でも、画面クラッシュせずエラー表示・ハンドリングができること。
 - [ ] 結果として3つのiframeにそれぞれのSketchA, B, Cが正しくレンダリングされること（各々にTailwindが適用されていること）。
 - [ ] iframe内で発生したJavaScriptエラーが、親要素のクラッシュを引き起こさずコンソール/UI上で捉えられること。
+- [ ] 生成される3つのSketchは単なるベアボーンなHTMLではなく、シャドウ・グラデーション・角丸・モダンなタイポグラフィ・インラインSVGアイコンなどを活用し、Claude Artifactsで生成されるような「リッチなアプリ感（Premium/Modern App-like UI）」を持つこと。
