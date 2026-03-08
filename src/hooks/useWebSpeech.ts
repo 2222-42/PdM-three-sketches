@@ -90,8 +90,18 @@ export function useWebSpeech() {
         };
 
         recognition.onerror = (event) => {
-            console.error('Speech recognition error', event.error);
-            setError(`Error: ${event.error}`);
+            console.error('Speech recognition error:', event.error);
+
+            let errorMessage = `Error: ${event.error}`;
+            if (event.error === 'network') {
+                errorMessage = 'ネットワークエラーが発生しました（Chromeの場合、Googleの音声認識サーバーへの接続に失敗した可能性があります）。インターネット環境を確認するか、時間をおいて再度お試しください。';
+            } else if (event.error === 'not-allowed') {
+                errorMessage = 'マイクへのアクセスが許可されていません。ブラウザの設定からマイクの利用を許可してください。';
+            } else if (event.error === 'no-speech') {
+                errorMessage = '音声が検出されませんでした。マイクを確認してもう一度お話しください。';
+            }
+
+            setError(errorMessage);
             setIsRecording(false);
         };
 
