@@ -53,7 +53,13 @@
   - [x] ブラウザ標準のWeb Speech APIを用いたリアルタイムSTT（文字起こし）機能の実装とUIへの反映
 - [ ] **UI/UXポリッシュ**
   - [ ] 全体的なデザイン、アニメーションの追加（生成中のスケルトンスクリーンや遷移エフェクト）
+- [x] **CrustData B2B Enrichment Integration**
+  - [x] `requirements.md` にCrustData Enrichmentをコア機能として追加
+  - [x] `spec.md` にEnrichmentモジュール仕様 (セクション3.5) とACCEPTANCE_CRITERIA3件を追加
+  - [x] `design.md` に `/api/enrich-company` エンドポイント定義・環境変数表・データフロー図を追加
+  - [x] `src/app/api/enrich-company/route.spec.md` 作成 (spec-first-enforcement準拠)
+  - [x] `src/lib/extractEntities.ts` 実装 (`extractDomains`, `extractLinkedInCompanyUrls`)
+  - [x] `src/app/api/enrich-company/route.ts` 実装 (CrustData API呼び出し・フォールバック)
+  - [x] `src/app/api/generate-structure/route.ts` 更新 (Entity抽出 → Enrich → プロンプト注入)
 - [ ] **最終デモ動画の撮影**
   - [ ] 1.5分以内のピッチ用デモ動画の録画・編集
-
-
