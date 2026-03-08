@@ -1,0 +1,53 @@
+# Development Phases & Tasks (tasks.md)
+
+本ドキュメントでは、MVPを最速でデプロイし、段階的に完成度を高めるためのタスクを定義します。
+
+## Phase 1: ファーストリリース (Fastest Deployable Version)
+**目標**: 最速で動くモックアップをVercelにデプロイし、全体的なUIの枠組みとデータフロー（ハードコード）を確認できるようにする。AI（LLM）APIはモックまたはシンプルな単一コールとする。
+
+- [/] **プロジェクトセットアップ**
+  - [ ] Next.js (App Router) + TailwindCSS の初期化とVercelへの初期デプロイ
+  - [ ] GitHubリポジトリの作成とVercel連携（CI/CDの自動デプロイ設定）
+- [ ] **基本UIコンポーネントの実装**
+  - [ ] `GoalInput`: GoalやTranscriptを受け取るテキストエリアとボタンの実装
+  - [ ] `SketchesGrid`: 3つのプレビュー枠（iframeまたはdiv）を配置
+- [ ] **モックAPI（バックエンド）の実装**
+  - [ ] `/api/generate-structure`: 固定のJSONを返すモックエンドポイント
+  - [ ] `/api/generate-sketches`: 固定のReact/Tailwindコンポーネント文字列（SketchA/B/C）を返すモックエンドポイント
+- [ ] **フロントエンドの結合**
+  - [ ] 入力からモックAPIを呼び出し、結果を画面に反映するロジック（ローディングステート含む）
+  - [ ] `SandboxedIframe` を用いたコードの安全なレンダリングテスト
+- [ ] **ファーストリリースデプロイ確認**
+  - [ ] Vercelの公開URLで正常に全フロー（モック）が動くことを確認する。
+
+## Phase 2: 次のステップ (Next Step - AI Integration)
+**目標**: 実際のLLM（Groq / Gemini / Shisa等）を組み込み、入力されたテキストから動的に構造化データおよびUIコードを生成する機能を完成させる。
+
+- [ ] **LLM APIプロバイダの選定と連携**
+  - [ ] 環境変数（API Key等）の設定
+  - [ ] Next.js Server Actions または API RouteでのLLMクライアント初期化
+- [ ] **`/api/generate-structure` の動的化**
+  - [ ] System Promptの構築（出力フォーマットをJSONに強制・EARS記法指示）
+  - [ ] ユーザー入力（Goal + Transcript）をプロンプトに組み込んでAPI呼び出し
+  - [ ] JSONパースとエラーリカバリ（正規表現フォールバック等）の実装
+- [ ] **`/api/generate-sketches` の動的化**
+  - [ ] 3つの異なるSystem Prompt（Simple, Data-heavy, Mobile）の構築
+  - [ ] 構造化JSONとGoalをもとに、3つのLLMコールを並列実行（`Promise.all`等）する実装
+  - [ ] 出力されたReact文字列のサニタイズ（余分なマークダウンの除去など）処理
+- [ ] **E2Eマニュアルテスト（AI生成の確認）**
+  - [ ] 実際の入力を与え、意図した通りの多様なUIが出力されるかテストする
+
+## Phase 3: 最終ステップ (Final Step - Polish & Extras)
+**目標**: ハッカソンの完成度を高めるためのUX向上機能や、差別化となる＋αの機能を実装する。
+
+- [ ] **リファクタリング・エラー処理の強化**
+  - [ ] 生成失敗時のUIフィードバック改善（トースト通知やスケッチ個別再生成など）
+  - [ ] プレビューでのJavaScriptエラー検知と親画面へのフィードバック
+- [ ] **音声入力の追加 (Optional but Recommended)**
+  - [ ] VoiceOS または Cactus Compute を用いたブラウザマイクからのリアルタイムSTT（文字起こし）機能の実装（Transcriptの自動入力）
+- [ ] **UI/UXポリッシュ**
+  - [ ] 全体的なデザイン、アニメーションの追加（生成中のスケルトンスクリーンや遷移エフェクト）
+- [ ] **最終デモ動画の撮影**
+  - [ ] 1.5分以内のピッチ用デモ動画の録画・編集
+
+
