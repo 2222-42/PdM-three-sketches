@@ -5,18 +5,18 @@
 ## Phase 1: ファーストリリース (Fastest Deployable Version)
 **目標**: 最速で動くモックアップをVercelにデプロイし、全体的なUIの枠組みとデータフロー（ハードコード）を確認できるようにする。AI（LLM）APIはモックまたはシンプルな単一コールとする。
 
-- [/] **プロジェクトセットアップ**
-  - [ ] Next.js (App Router) + TailwindCSS の初期化とVercelへの初期デプロイ
+- [x] **プロジェクトセットアップ**
+  - [x] Next.js (App Router) + TailwindCSS の初期化とVercelへの初期デプロイ
   - [ ] GitHubリポジトリの作成とVercel連携（CI/CDの自動デプロイ設定）
-- [ ] **基本UIコンポーネントの実装**
-  - [ ] `GoalInput`: GoalやTranscriptを受け取るテキストエリアとボタンの実装
-  - [ ] `SketchesGrid`: 3つのプレビュー枠（iframeまたはdiv）を配置
-- [ ] **モックAPI（バックエンド）の実装**
-  - [ ] `/api/generate-structure`: 固定のJSONを返すモックエンドポイント
-  - [ ] `/api/generate-sketches`: 固定のReact/Tailwindコンポーネント文字列（SketchA/B/C）を返すモックエンドポイント
-- [ ] **フロントエンドの結合**
-  - [ ] 入力からモックAPIを呼び出し、結果を画面に反映するロジック（ローディングステート含む）
-  - [ ] `SandboxedIframe` を用いたコードの安全なレンダリングテスト
+- [x] **基本UIコンポーネントの実装**
+  - [x] `GoalInput`: GoalやTranscriptを受け取るテキストエリアとボタンの実装
+  - [x] `SketchesGrid`: 3つのプレビュー枠（iframeまたはdiv）を配置
+- [x] **モックAPI（バックエンド）の実装**
+  - [x] `/api/generate-structure`: 固定のJSONを返すモックエンドポイント
+  - [x] `/api/generate-sketches`: 固定のReact/Tailwindコンポーネント文字列（SketchA/B/C）を返すモックエンドポイント
+- [x] **フロントエンドの結合**
+  - [x] 入力からモックAPIを呼び出し、結果を画面に反映するロジック（ローディングステート含む）
+  - [x] `SandboxedIframe` を用いたコードの安全なレンダリングテスト
 - [ ] **ファーストリリースデプロイ確認**
   - [ ] Vercelの公開URLで正常に全フロー（モック）が動くことを確認する。
 

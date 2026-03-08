@@ -1,63 +1,169 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import GoalInput from '@/components/GoalInput';
+import SketchesGrid from '@/components/SketchesGrid';
+
+interface StructuredData {
+  problems: string[];
+  requirements: string[];
+  constraints: string[];
+  workflow: string;
+  progress: string;
+}
+
+interface Sketches {
+  A: string;
+  B: string;
+  C: string;
+}
 
 export default function Home() {
+  const [goal, setGoal] = useState('');
+  const [transcript, setTranscript] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [structuredData, setStructuredData] = useState<StructuredData | null>(null);
+  const [sketches, setSketches] = useState<Sketches | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleGenerate = async () => {
+    if (!goal.trim()) return;
+
+    setIsGenerating(true);
+    setError(null);
+    setStructuredData(null);
+    setSketches(null);
+
+    try {
+      // Step 1: Generate Structure
+      const structureRes = await fetch('/api/generate-structure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal, transcript }),
+      });
+
+      if (!structureRes.ok) throw new Error('Failed to generate structure');
+      const generatedStructure = await structureRes.json();
+      setStructuredData(generatedStructure);
+
+      // Step 2: Generate Sketches (using the generated structure)
+      const sketchesRes = await fetch('/api/generate-sketches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal, structuredData: generatedStructure }),
+      });
+
+      if (!sketchesRes.ok) throw new Error('Failed to generate sketches');
+      const generatedSketches = await sketchesRes.json();
+      setSketches({
+        A: generatedSketches.sketchA,
+        B: generatedSketches.sketchB,
+        C: generatedSketches.sketchC,
+      });
+
+    } catch (err) {
+      console.error(err);
+      setError('An error occurred during generation. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
+        <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+              3S
+            </div>
+            <h1 className="text-xl font-bold text-gray-800">
+              Meeting to Prototypes <span className="text-sm font-normal text-gray-400 ml-2">Hackathon MVP</span>
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <a href="https://github.com" target="_blank" rel="noreferrer" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+              GitHub
+            </a>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-[1600px] mx-auto px-6 py-8">
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 flex items-center gap-3">
+            <span>⚠️</span>
+            <p>{error}</p>
+          </div>
+        )}
+
+        <div className="flex flex-col lg:flex-row gap-8">
+
+          {/* Left Column (Input & Context) */}
+          <div className="w-full lg:w-[400px] flex flex-col gap-6 shrink-0">
+            <GoalInput
+              goal={goal}
+              setGoal={setGoal}
+              transcript={transcript}
+              setTranscript={setTranscript}
+              onGenerate={handleGenerate}
+              isGenerating={isGenerating}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+            {/* Structured Data Preview (Optional/Debug View) */}
+            {(structuredData || isGenerating) && (
+              <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-700 mb-4 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                  AI Understanding
+                </h3>
+
+                {!structuredData && isGenerating ? (
+                  <div className="space-y-3">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+                  </div>
+                ) : structuredData && (
+                  <div className="space-y-4 text-sm">
+                    <div>
+                      <p className="font-semibold text-gray-700 mb-1">Identified Problems:</p>
+                      <ul className="list-disc pl-4 text-gray-600 space-y-1">
+                        {structuredData.problems.map((p, i) => <li key={i}>{p}</li>)}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-700 mb-1">Key Requirements:</p>
+                      <ul className="list-disc pl-4 text-gray-600 space-y-1">
+                        {structuredData.requirements.map((r, i) => <li key={i}>{r}</li>)}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-700 mb-1">Proposed Workflow:</p>
+                      <p className="text-gray-600 bg-white p-3 rounded border border-gray-200 text-xs">
+                        {structuredData.workflow}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Right Column (Sketches/Previews) */}
+          <div className="flex-1 flex flex-col min-w-0">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                <span className="text-2xl">✨</span>
+                Generated UI Sketches
+              </h2>
+            </div>
+
+            <SketchesGrid sketches={sketches} isGenerating={isGenerating} />
+          </div>
+
         </div>
       </main>
     </div>
