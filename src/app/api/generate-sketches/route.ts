@@ -42,57 +42,33 @@ export async function POST(request: Request) {
 
     const model = openrouter('meta-llama/llama-3.1-70b-instruct');
 
-    // Convert structured data to a string context
     const contextStr = JSON.stringify(structuredData, null, 2);
 
+    // Extract the 3 dynamic ideas
+    const ideas = structuredData.ideas || [
+      { title: "Simplest Solution (Clean UI)", description: "Focus on extreme simplicity and a clean, premium minimalist UI." },
+      { title: "Data-heavy (Charts/Tables)", description: "Focus on showing data effectively with a very high-quality B2B SaaS look." },
+      { title: "Mobile First (Responsive)", description: "Focus on a mobile-responsive, touch-friendly, native-app-like interface." }
+    ];
+
     // Parallel execution for 3 sketches
-    const [resultA, resultB, resultC] = await Promise.all([
-      generateText({
+    const sketchesPromises = ideas.slice(0, 3).map((idea: { title: string; description: string }) => {
+      return generateText({
         model,
         system: SYSTEM_PROMPT_BASE,
         prompt: `
-        Design Concept: "Minimalist & Elegant (Simplest Possible Solution)"
-        Focus on extreme simplicity and a clean, premium minimalist UI. 
-        - Use a lot of white space, subtle gray dividing lines (\`border-b border-gray-100\`), and elegant typography.
-        - The main content should probably be centered or in a clean card layout with \`max-w-3xl mx-auto mt-10 rounded-2xl shadow-sm border border-gray-200\`.
-        - Use a very restrained color palette (mostly black/white/gray with one accent color).
+        Design Concept Title: "${idea.title}"
+        Design Approach / Perspective: "${idea.description}"
+        
+        Focus on implementing this specific approach. Translate the idea into a well-designed, functional UI component.
         
         Requirements Context:
         ${contextStr}
         `,
-      }),
-      generateText({
-        model,
-        system: SYSTEM_PROMPT_BASE,
-        prompt: `
-        Design Concept: "Professional Admin/Data Dashboard"
-        Focus on showing data effectively with a very high-quality B2B SaaS look.
-        - Create a layout with a sleek top navbar or a side navigation menu. 
-        - Use metric/stat cards at the top (\`bg-white rounded-xl shadow-sm border border-slate-200 p-5\`).
-        - Implement a beautifully styled data table (with subtle alternating row colors, hover states, status badges using \`bg-green-100 text-green-800 rounded-full px-2.5 py-0.5 text-xs font-medium\`).
-        - Include simulated charts/graphs using styled div blocks if appropriate.
-        - The background should probably be slightly off-white (e.g., \`bg-slate-50\`).
-        
-        Requirements Context:
-        ${contextStr}
-        `,
-      }),
-      generateText({
-        model,
-        system: SYSTEM_PROMPT_BASE,
-        prompt: `
-        Design Concept: "Modern Mobile App Experience"
-        Focus on a mobile-responsive, touch-friendly, native-app-like interface.
-        - The container should be constrained to a mobile phone ratio (e.g., \`max-w-md mx-auto h-[800px] overflow-y-auto bg-gray-50 shadow-2xl relative rounded-[3rem] border-[14px] border-gray-900\` to look like a phone, or just a generic mobile wrapper).
-        - Include a fixed bottom navigation bar with inline SVG icons.
-        - Use large tap targets, full-width cards (\`bg-white rounded-2xl p-4 shadow-sm mb-4\`), and engaging micro-interactions (indicated by UI structure).
-        - Use a vibrant but professional color palette suitable for consumer or modern B2B field apps.
-        
-        Requirements Context:
-        ${contextStr}
-        `,
-      }),
-    ]);
+      });
+    });
+
+    const [resultA, resultB, resultC] = await Promise.all(sketchesPromises);
 
     // Robust markdown sanitizer
     const sanitizeResult = (text: string) => {

@@ -5,9 +5,9 @@ PdM 3 Sketches / Meeting to Prototypesは、オンラインミーティングで
 
 ## 2. ユーザーフロー (User Flow)
 1. **音声からの自動文字起こし**: ミーティングの会話内容をAIや外部APIを用いてリアルタイム（またはバッチ）で自動的に文字起こし（Transcript）して取得します。人間による手動テキスト入力は行いません。
-2. **要件構造化**: [Generate Structure]ボタン押下で、LLMが文字起こしされたTranscriptを解析し、JSON形式で課題・要件・制約・ワークフローを進捗に整理します。
+2. **要件構造化**: [Generate Structure]ボタン押下で、LLMが文字起こしされたTranscriptを解析し、JSON形式で課題・要件・制約・ワークフローを進捗に整理し、さらにUIデザインの方向性となる「3つのアプローチ（ideas）」を提案します。
 3. **UIスケッチ生成**: [Generate Sketches]ボタン押下で、構造化された要件JSONをもとに、アプローチの異なる3つの独立したReactコンポーネントコード（Tailwind付き）を生成します。
-4. **プレビューと確認**: 右側のパネルに3パターンのプレビュー（Simple / Data-heavy / Mobile）が即座に表示され、PdMが視覚的にUIの方向性を確認できます。
+4. **プレビューと確認**: 右側のパネルに3パターンのプレビューが即座に表示され、左側のコンポーネント（AI Understandingなど）は「Peek Component」として隠れ、スケッチに集中できるUIになります。
 
 ## 3. 機能仕様詳細 (Functional Specs)
 ### 3.1 入力セクション (Input Area)
@@ -24,18 +24,22 @@ PdM 3 Sketches / Meeting to Prototypesは、オンラインミーティングで
     "requirements": ["..."],
     "constraints": ["..."],
     "workflow": "...",
-    "progress": "..."
+    "progress": "...",
+    "ideas": [
+      {
+        "title": "Minimalist Approach",
+        "description": "Focusing on core user flow without distractions."
+      }
+    ]
   }
   ```
 - **エラーハンドリング**:
   - JSONパース失敗時、リトライまたは正規表現でのフォールバック抽出処理を行う。（NEEDS CLARIFICATIONの定義に基づく）
 
 ### 3.3 UI生成モジュール (Sketches Generator)
-- **入力**: 構造化された要件JSON
+- **入力**: 構造化された要件JSON（`ideas`配列を含む）
 - **生成バリエーション**:
-  1. Sketch A (Simplest): 最低限の機能に絞ったクリーンなUI
-  2. Sketch B (Data-heavy): グラフやテーブルを多用したデータ可視化特化UI
-  3. Sketch C (Mobile): モバイルファーストのレスポンシブUI
+  `ideas` の配列にある3つのアプローチ（タイトルおよび説明）に基づき、3パターンのUIを動的プロンプティングで生成します。
 - **制約事項**:
   - TailwindCSSのCDNスクリプトを内包
   - 単一ファイル内で完結したFunctional Component
@@ -54,6 +58,9 @@ PdM 3 Sketches / Meeting to Prototypesは、オンラインミーティングで
 
 ## 5. ACCEPTANCE_CRITERIA (受入基準)
 *本セクションはRule `spec-first-enforcement`に基づく*
+- [ ] タイトルヘッダが「3 Sketches」になっていること。
+- [ ] 3つのSketchesの各iframeの上部に、それぞれのアプローチの観点（一文 or 2~3単語のタイトル）が明記されていること。
+- [ ] スケッチが生成された後、左部分の入力・コンテキストパネル（Voice Transcript / AI Understanding）が「Peek Component」として隠れ、スケッチに集中できること。
 - [ ] AI/API経由で取得したTranscriptが空録音や無音などで取得できず、空のまま構造化ボタンを押した場合、エラーまたは警告が表示されること。
 - [ ] LLMの応答が不正なJSONだった場合でも、画面クラッシュせずエラー表示・ハンドリングができること。
 - [ ] 結果として3つのiframeにそれぞれのSketchA, B, Cが正しくレンダリングされること（各々にTailwindが適用されていること）。
