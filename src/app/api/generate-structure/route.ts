@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 // Initialize OpenAI client with Shisa AI base URL
 const shisa = createOpenAI({
-    baseURL: 'https://api.shisa.ai/v1',
+    baseURL: 'https://api.shisa.ai/openai/v1',
     apiKey: process.env.SHISA_API_KEY,
 });
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'SHISA_API_KEY is not set' }, { status: 500 });
         }
 
-        const modelName = process.env.SHISA_MODEL || 'shisa-v1';
+        const modelName = process.env.SHISA_MODEL || 'shisa-ai/shisa-v2.1-llama3.3-70b';
 
         const { object } = await generateObject({
             model: shisa(modelName),
