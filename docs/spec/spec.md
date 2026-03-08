@@ -16,7 +16,7 @@ PdM 3 Sketches / Meeting to Prototypesは、オンラインミーティングで
 
 ### 3.2 構造化モジュール (JSON Generator)
 - **トリガー**: ボタンプッシュ
-- **処理**: 音声から生成されたTranscriptテキストをLLM (Groq Llama 3.1 70B等)に入力。
+- **処理**: 音声から生成されたTranscriptテキストをLLM (OpenRouter経由)に入力。
 - **出力形式**:
   ```json
   {
